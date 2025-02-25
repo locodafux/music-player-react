@@ -58,17 +58,26 @@ const MusicPlayer = () => {
     const music = musics[index];
     if (audioRef.current) {
       console.log("Setting audio source:", music.audio); // Debugging
+  
+      // Pause current track before changing source
+      audioRef.current.pause();
       audioRef.current.src = music.audio;
       audioRef.current.load(); // Load the new source
-      if (play) {
-        audioRef.current.play().catch((error) => {
-          console.error("Error playing audio:", error);
-        });
-        setIsPlaying(true);
-      }
+  
+      // Wait for the audio to be ready before playing
+      audioRef.current.oncanplaythrough = () => {
+        if (play) {
+          audioRef.current.play().catch((error) => {
+            console.error("Error playing audio:", error);
+          });
+          setIsPlaying(true);
+        }
+      };
+  
       setSelectedMusic(index);
     }
   };
+  
 
   const handlePrevious = () => {
     const newIndex = (selectedMusic - 1 + musics.length) % musics.length;
